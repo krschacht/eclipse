@@ -1,0 +1,15 @@
+# more details here: https://docs.render.com/deploy-rails
+
+services:
+  - type: web
+    name: eclipse
+    runtime: ruby
+    plan: starter
+    buildCommand: "./bin/render-build.sh"
+    # preDeployCommand: "./bin/rails db:migrate" # preDeployCommand only available on paid instance types
+    startCommand: "./bin/rails server"
+    envVars:
+      - key: RAILS_MASTER_KEY
+        sync: false
+      - key: WEB_CONCURRENCY
+        value: 2
