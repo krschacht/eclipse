@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-ruby "3.2.3"
+ruby File.readlines(File.join(__dir__ , ".tool-versions")).select{|l| l =~ /ruby/}.first.strip.split.last
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 7.1.3", ">= 7.1.3.2"
@@ -18,7 +18,7 @@ gem "puma", ">= 5.0"
 gem "importmap-rails"
 
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
-gem "turbo-rails"
+gem "turbo-rails", "~> 2.0.2"
 
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "stimulus-rails"
@@ -53,28 +53,6 @@ group :development, :test do
 end
 
 group :development do
-  # Use console on exceptions pages [https://github.com/rails/web-console]
-  gem "web-console"
-
-  # Add speed badges [https://github.com/MiniProfiler/rack-mini-profiler]
-  # gem "rack-mini-profiler"
-
-  # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
-  # gem "spring"
-end
-
-group :test do
-  # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
-  gem "capybara"
-  gem "selenium-webdriver"
-end
-gem "turbo-rails", "~> 2.0.2"
-gem "solid_queue", "~> 0.2.1"
-gem "redis", ">= 4.0.1"
-gem "bcrypt", "~> 3.1.7"
-gem "rails_heroicon", "~> 2.2.0"
-
-group :development do
   gem "web-console"
   gem "byebug", platforms: [:mri, :mingw, :x64_mingw]
   gem "pry-rails"
@@ -84,3 +62,13 @@ group :development do
   gem "rubocop-capybara"
   gem "rubocop-minitest"
 end
+
+
+group :test do
+  # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
+  gem "capybara"
+  gem "selenium-webdriver"
+end
+
+# gem "solid_queue", "~> 0.2.1"
+gem "rails_heroicon", "~> 2.2.0"
