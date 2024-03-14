@@ -976,13 +976,14 @@ export default class extends Controller {
   // CALCULATE!
   calculatefor(el) {
     this.readform()
-    this.clearoldresults();
-    var results = document.getElementById("el_results");
+    //this.clearoldresults();
+    var results = document.getElementById("results");
+    var qualifications = document.getElementById("qualifications");
     var p = document.createElement("p");
     p.setAttribute("id","el_locationtable");
-    var b = document.createElement("h2");
-    b.appendChild(document.createTextNode("Solar Eclipses visible from  "+document.eclipseform.loc_name.value));
-    p.appendChild(b);
+    // var b = document.createElement("h2");
+    // b.appendChild(document.createTextNode("Solar Eclipses visible from  "+document.eclipseform.loc_name.value));
+    // p.appendChild(b);
     var resultsTable = document.createElement("table");
     resultsTable.setAttribute("border","0");
     var tbody = document.createElement("tbody");
@@ -1057,8 +1058,9 @@ export default class extends Controller {
     tbody.appendChild(row);
     resultsTable.appendChild(tbody);
     p.appendChild(resultsTable);
-    results.appendChild(p);
+    qualifications.appendChild(p);
 
+    // Begin results table
     resultsTable = document.createElement("table");
     resultsTable.setAttribute("id","el_resultstable");
     resultsTable.setAttribute("width","150");
@@ -1111,6 +1113,8 @@ export default class extends Controller {
     for (var i = 0 ; i < el.length ; i+=28) {
       this.obsvconst[6]=i;
       this.getall(el)
+      if (this.mid[39] == 1 || this.mid[39] == 2) continue
+
       // Is there an event...
       if (this.mid[39] > 0) {
         row = document.createElement("tr");
@@ -1122,9 +1126,9 @@ export default class extends Controller {
         td = document.createElement("td");
         td.setAttribute("align","center");
         if (this.mid[39] == 1) {
-       val = document.createTextNode("P");
+          val = document.createTextNode("P");
         } else if (this.mid[39] == 2) {
-          val = document.createTextNode("A");
+          val = document.createTextNode("A"); // TODO: What is an "A" eclipse?
         } else {
           val = document.createTextNode("T");
         }
@@ -1140,16 +1144,16 @@ export default class extends Controller {
           td.appendChild(document.createTextNode("\u00a0"))
           row.appendChild(td)
         } else {
-      // Partial eclipse start time
-      td = document.createElement("td");
+          // Partial eclipse start time
+          td = document.createElement("td");
           td.setAttribute("nowrap","")
           td.appendChild(this.gettime(el,this.c1));
-      row.appendChild(td);
-      // Partial eclipse alt
-      td = document.createElement("td");
-      td.setAttribute("align","right");
-      td.appendChild(this.getalt(this.c1));
-      row.appendChild(td);
+          row.appendChild(td);
+          // Partial eclipse alt
+          td = document.createElement("td");
+          td.setAttribute("align","right");
+          td.appendChild(this.getalt(this.c1));
+          row.appendChild(td);
         }
     // Central eclipse time
     td = document.createElement("td");
