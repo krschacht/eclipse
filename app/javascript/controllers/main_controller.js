@@ -209,6 +209,8 @@ export default class extends Controller {
 
     this.month = new Array("Jan","Feb","Mar","Apr","May","Jun","Jul",
                           "Aug","Sep","Oct","Nov","Dec");
+    this.prettyMonth = new Array("", "January","February","March","April","May","June","July",
+    "August","September","October","November","December");
 
     this.c1 = new Array();
     this.c2 = new Array();
@@ -756,10 +758,97 @@ export default class extends Controller {
     return ans
   }
 
+  getPrettyDatePieces(elements,circumstances) {
+    var t, jd, a, b, c, d, e, index
+
+    index = this.obsvconst[6]
+    // Calculate the JD for noon (TDT) the day before the day that contains T0
+    jd = Math.floor(elements[index] - (elements[1+index]/24.0))
+    // Calculate the local time (ie the offset in hours since midnight TDT on the day containing T0).
+    t = circumstances[1] + elements[1+index] - this.obsvconst[3] - (elements[4+index] - 0.5) / 3600.0
+    if (t < 0.0) {
+      jd--;
+    }
+    if (t >= 24.0) {
+      jd++;
+    }
+    if (jd >= 2299160.0) {
+      a = Math.floor((jd - 1867216.25) / 36524.25)
+      a = jd + 1 + a - Math.floor(a/4);
+    } else {
+      a = jd;
+    }
+    b = a + 1525.0
+    c = Math.floor((b-122.1)/365.25)
+    d = Math.floor(365.25*c)
+    e = Math.floor((b - d) / 30.6001)
+    d = b - d - Math.floor(30.6001*e)
+    if (e < 13.5) {
+      e = e - 1
+    } else {
+      e = e - 13
+    }
+
+    var mon = e
+    var day = d
+    var year = (e > 2.5) ? c - 4716 : c - 4715
+
+    return [mon, day, year]
+  }
+  getDay(elements,circumstances) {
+    return this.getPrettyDatePieces(elements,circumstances)[1]
+  }
+
+  getMonth(elements,circumstances) {
+    return this.getPrettyDatePieces(elements,circumstances)[0]
+  }
+
+  getPrettyMonth(elements,circumstances) {
+    return this.prettyMonth[this.getMonth(elements,circumstances)]
+  }
+
+  getYear(elements,circumstances) {
+    return this.getPrettyDatePieces(elements,circumstances)[2]
+  }
+
+  getPrettyDate(e,c) {
+     return `${this.getPrettyMonth(e,c)} ${this.getDay(e,c)}, ${this.getYear(e,c)}`
+  }
+
+  getPrettyDistance(e,c) {
+    var years, months, days = 0
+
+    var date = new Date()
+
+    years = this.getYear(e,c) - date.getFullYear()
+    months = this.getMonth(e,c) - date.getMonth()
+
+    if (months < 0) {
+      years -= 1
+      months += 12
+    }
+
+    if (years == 0 && months == 0) {
+      days = this.getDay(e,c) - date.getDate()
+    }
+
+    if (years <= 0 && months <= 0 && days <= 0) return null
+
+    if (years <= 0) {
+      if (months <= 0) {
+        return `${days} days`
+      } else {
+        return `${months} months`
+      }
+    } else {
+      return `${years} years`
+    }
+  }
+
   //
   // Get the local time of an event
   gettime(elements,circumstances) {
-    var t, ans, index
+    var t, ans, index, ampm
 
     ans = ""
     index = this.obsvconst[6]
@@ -773,20 +862,27 @@ export default class extends Controller {
     if (t < 10.0) {
       ans = ans + "0"
     }
-    ans = ans + Math.floor(t) + ":"
+    var hour = Math.floor(t)
+    if (hour > 12) {
+      ampm = 'P.M.'
+      hour -= 12
+    } else {
+      ampm = 'A.M.'
+    }
+    ans = ans + hour + ":"
     t = (t * 60.0) - 60.0 * Math.floor(t)
     if (t < 10.0) {
       ans = ans + "0"
     }
     ans = ans + Math.floor(t)
-    if (circumstances[40] <= 1) { // not sunrise or sunset
-      ans = ans + ":"
-      t = (t * 60.0) - 60.0 * Math.floor(t)
-      if (t < 10.0) {
-        ans = ans + "0"
-      }
-      ans = ans + Math.floor(t)
-    }
+    // if (circumstances[40] <= 1) { // not sunrise or sunset
+    //   ans = ans + ":"
+    //   t = (t * 60.0) - 60.0 * Math.floor(t)
+    //   if (t < 10.0) {
+    //     ans = ans + "0"
+    //   }
+    //   ans = ans + Math.floor(t)
+    // }
     if (circumstances[40] == 1) {
       html = document.createElement("font");
       html.setAttribute("color","#808080");
@@ -795,11 +891,11 @@ export default class extends Controller {
       html.appendChild(ital);
       return html;
     } else if (circumstances[40] == 2) {
-      return document.createTextNode(ans+"(r)");
+      return ans+"(r) "+ampm;
     } else if (circumstances[40] == 3) {
-      return document.createTextNode(ans+"(s)");
+      return ans+"(s) "+ampm;
     } else {
-      return document.createTextNode(ans);
+      return ans+" "+ampm;
     }
   }
 
@@ -905,6 +1001,35 @@ export default class extends Controller {
     return ans
   }
 
+  getPrettyDuration() {
+    var tmp;
+
+    if (this.c3[40] == 4) {
+      tmp = this.mid[1]-this.c2[1]
+    } else if (this.c2[40] == 4) {
+      tmp = this.c3[1]-this.mid[1]
+    } else {
+      tmp=this.c3[1]-this.c2[1];
+    }
+    if (tmp<0.0) {
+      tmp=tmp+24.0
+    } else if (tmp >= 24.0) {
+      tmp=tmp-24.0
+    }
+    tmp=(tmp*60.0)-60.0*Math.floor(tmp)+0.05/60.0;
+    var min = Math.floor(tmp)
+    tmp=(tmp*60.0)-60.0*Math.floor(tmp)
+    if (tmp < 10.0) {
+      ans=ans+"0"
+    }
+    var sec = Math.floor(tmp)
+
+    if (min > 0)
+      return `${min} minute${min > 1 ? 's' : ''} and ${sec} second${sec > 1 ? 's' : ''}`
+    else
+      reutrn `${sec} second${sec > 1 ? 's' : ''}`
+  }
+
   //
   // Get the magnitude
   getmagnitude() {
@@ -977,7 +1102,10 @@ export default class extends Controller {
   calculatefor(el) {
     this.readform()
     //this.clearoldresults();
-    var results = document.getElementById("results");
+    var list = document.getElementById("results");
+    var results = document.getElementById("old-results");
+    //console.log('first: ' + results.innerText == '')
+
     var qualifications = document.getElementById("qualifications");
     var p = document.createElement("p");
     p.setAttribute("id","el_locationtable");
@@ -1109,130 +1237,145 @@ export default class extends Controller {
     td = document.createElement("th");
     td.appendChild(document.createTextNode("A or T Eclipse Duration"));
     row.appendChild(td);
-    tbody.appendChild(row);
+    if (results.innerText == '') tbody.appendChild(row);
+
     for (var i = 0 ; i < el.length ; i+=28) {
       this.obsvconst[6]=i;
       this.getall(el)
-      if (this.mid[39] == 1 || this.mid[39] == 2) continue
+      if (this.mid[39] <= 2) continue // filters out everything except "T" type, TODO: what's "A"?
 
-      // Is there an event...
-      if (this.mid[39] > 0) {
-        row = document.createElement("tr");
-        td = document.createElement("td");
-        td.setAttribute("nowrap","")
-        var val = document.createTextNode(this.getdate(el,this.mid));
-        td.appendChild(val);
-        row.appendChild(td);
-        td = document.createElement("td");
-        td.setAttribute("align","center");
-        if (this.mid[39] == 1) {
-          val = document.createTextNode("P");
-        } else if (this.mid[39] == 2) {
-          val = document.createTextNode("A"); // TODO: What is an "A" eclipse?
-        } else {
-          val = document.createTextNode("T");
-        }
-    td.appendChild(val);
-    row.appendChild(td);
-        // Partial eclipse start
-        if (this.c1[40] == 4) {
-          td = document.createElement("td")
-          td.setAttribute("align","center")
-          td.appendChild(document.createTextNode("-"))
-          row.appendChild(td)
-          td = document.createElement("td")
-          td.appendChild(document.createTextNode("\u00a0"))
-          row.appendChild(td)
-        } else {
-          // Partial eclipse start time
-          td = document.createElement("td");
-          td.setAttribute("nowrap","")
-          td.appendChild(this.gettime(el,this.c1));
-          row.appendChild(td);
-          // Partial eclipse alt
-          td = document.createElement("td");
-          td.setAttribute("align","right");
-          td.appendChild(this.getalt(this.c1));
-          row.appendChild(td);
-        }
-    // Central eclipse time
-    td = document.createElement("td");
-    if ((this.mid[39] > 1) && (this.c2[40] != 4)) {
-          td.setAttribute("nowrap","")
-          td.appendChild(this.gettime(el,this.c2));
-    } else {
-      td.setAttribute("align","center");
-      td.appendChild(document.createTextNode("-"));
-    }
-    row.appendChild(td);
-    // Maximum eclipse time
-    td = document.createElement("td");
-        td.setAttribute("nowrap","")
-    td.appendChild(this.gettime(el,this.mid));
-    row.appendChild(td);
-    // Maximum eclipse alt
-    td = document.createElement("td");
-    td.setAttribute("align","right");
-    td.appendChild(this.getalt(this.mid));
-    row.appendChild(td);
-    // Maximum eclipse azi
-    td = document.createElement("td");
-    td.setAttribute("align","right");
-    td.appendChild(this.getazi(this.mid));
-    row.appendChild(td);
-    // Central eclipse ends
-    td = document.createElement("td");
-    if ((this.mid[39] > 1) && (this.c3[40] != 4)) {
-          td.setAttribute("nowrap","")
-      td.appendChild(this.gettime(el,this.c3));
-    } else {
-      td.setAttribute("align","center");
-      td.appendChild(document.createTextNode("-"));
-    }
-    row.appendChild(td);
-        // Partial eclipse ends
-        if (this.c4[40] == 4) {
-          td = document.createElement("td")
-          td.setAttribute("align","center")
-          td.appendChild(document.createTextNode("-"))
-          row.appendChild(td)
-          td = document.createElement("td")
-          td.appendChild(document.createTextNode("\u00a0"))
-          row.appendChild(td)
-        } else {
-      // Partial eclipse ends
+      var div = document.createElement("div")
+      var h2 = document.createElement("h2")
+      var p = document.createElement("p")
+      div.appendChild(h2)
+      div.appendChild(p)
+
+      h2.setAttribute("class", "title")
+      h2.appendChild(document.createTextNode(`In ${this.getPrettyDistance(el,this.mid)}, on ${this.getPrettyDate(el,this.mid)}`))
+
+      p.appendChild(document.createTextNode(`The eclipse will begin at ${this.gettime(el,this.c1)} It will be totality at ${this.gettime(el,this.mid)} for a total of ${this.getPrettyDuration()}.`))
+
+      list.appendChild(div)
+      // There an event...
+      row = document.createElement("tr");
       td = document.createElement("td");
-          td.setAttribute("nowrap","")
-          td.appendChild(this.gettime(el,this.c4));
+      td.setAttribute("nowrap","")
+      var val = document.createTextNode(this.getdate(el,this.mid));
+      console.log(`date: `, this.getdate(el,this.mid));
+      td.appendChild(val);
       row.appendChild(td);
-      // ... sun alt
       td = document.createElement("td");
-      td.setAttribute("align","right");
-      td.appendChild(this.getalt(this.c4));
-      row.appendChild(td);
-        }
-    // Eclipse magnitude
-    td = document.createElement("td");
-    td.appendChild(this.getmagnitude());
-    row.appendChild(td);
-    // Coverage
-    td = document.createElement("td");
-    td.appendChild(this.getcoverage());
-    row.appendChild(td);
-    // Central duration
-    td = document.createElement("td");
-    if (this.mid[39] > 1) {
-      td.setAttribute("align","right");
-          td.setAttribute("nowrap","")
-      val = document.createTextNode(this.getduration());
-    } else {
       td.setAttribute("align","center");
-      val = document.createTextNode("-");
-    }
-    td.appendChild(val);
-    row.appendChild(td);
-    tbody.appendChild(row);
+      if (this.mid[39] == 1) {
+        val = document.createTextNode("P");
+      } else if (this.mid[39] == 2) {
+        val = document.createTextNode("A"); // TODO: What is an "A" eclipse?
+      } else {
+        val = document.createTextNode("T");
       }
+      td.appendChild(val);
+      row.appendChild(td);
+      // Partial eclipse start
+      if (this.c1[40] == 4) { // TODO: What is this case?
+        td = document.createElement("td")
+        td.setAttribute("align","center")
+        td.appendChild(document.createTextNode("-"))
+        row.appendChild(td)
+        td = document.createElement("td")
+        td.appendChild(document.createTextNode("\u00a0"))
+        row.appendChild(td)
+      } else {
+        // Partial eclipse start time
+        td = document.createElement("td");
+        td.setAttribute("nowrap","")
+        td.appendChild(document.createTextNode(this.gettime(el,this.c1)));
+        console.log(`start: `, this.gettime(el,this.c1));
+        row.appendChild(td);
+        // Partial eclipse alt
+        td = document.createElement("td");
+        td.setAttribute("align","right");
+        td.appendChild(this.getalt(this.c1));
+        row.appendChild(td);
+      }
+      // Central eclipse time
+      td = document.createElement("td");
+      if ((this.mid[39] > 1) && (this.c2[40] != 4)) {
+            td.setAttribute("nowrap","")
+            td.appendChild(document.createTextNode(this.gettime(el,this.c2)));
+      } else {
+        td.setAttribute("align","center");
+        td.appendChild(document.createTextNode("-"));
+      }
+      row.appendChild(td);
+      // Maximum eclipse time
+      td = document.createElement("td");
+          td.setAttribute("nowrap","")
+      td.appendChild(document.createTextNode(this.gettime(el,this.mid)));
+      console.log(`totality: `, this.gettime(el,this.mid))
+      row.appendChild(td);
+      // Maximum eclipse alt
+      td = document.createElement("td");
+      td.setAttribute("align","right");
+      td.appendChild(this.getalt(this.mid));
+      row.appendChild(td);
+      // Maximum eclipse azi
+      td = document.createElement("td");
+      td.setAttribute("align","right");
+      td.appendChild(this.getazi(this.mid));
+      row.appendChild(td);
+      // Central eclipse ends
+      td = document.createElement("td");
+      if ((this.mid[39] > 1) && (this.c3[40] != 4)) {
+            td.setAttribute("nowrap","")
+        td.appendChild(document.createTextNode(this.gettime(el,this.c3)));
+      } else {
+        td.setAttribute("align","center");
+        td.appendChild(document.createTextNode("-"));
+      }
+      row.appendChild(td);
+          // Partial eclipse ends
+          if (this.c4[40] == 4) {
+            td = document.createElement("td")
+            td.setAttribute("align","center")
+            td.appendChild(document.createTextNode("-"))
+            row.appendChild(td)
+            td = document.createElement("td")
+            td.appendChild(document.createTextNode("\u00a0"))
+            row.appendChild(td)
+          } else {
+        // Partial eclipse ends
+        td = document.createElement("td");
+            td.setAttribute("nowrap","")
+            td.appendChild(document.createTextNode(this.gettime(el,this.c4)));
+        row.appendChild(td);
+        // ... sun alt
+        td = document.createElement("td");
+        td.setAttribute("align","right");
+        td.appendChild(this.getalt(this.c4));
+        row.appendChild(td);
+          }
+      // Eclipse magnitude
+      td = document.createElement("td");
+      td.appendChild(this.getmagnitude());
+      row.appendChild(td);
+      // Coverage
+      td = document.createElement("td");
+      td.appendChild(this.getcoverage());
+      row.appendChild(td);
+      // Central duration
+      td = document.createElement("td");
+      if (this.mid[39] > 1) {
+        td.setAttribute("align","right");
+            td.setAttribute("nowrap","")
+        val = document.createTextNode(this.getduration());
+        console.log(`duration: `, this.getduration());
+      } else {
+        td.setAttribute("align","center");
+        val = document.createTextNode("-");
+      }
+      td.appendChild(val);
+      row.appendChild(td);
+      tbody.appendChild(row);
     }
     resultsTable.appendChild(tbody);
     results.appendChild(resultsTable);
@@ -1326,7 +1469,17 @@ export default class extends Controller {
     // script.defer = false;
     // head.appendChild(script);
 
-    this.recalculate()
+    //this.recalculate()
+    this.SE2001()
+    this.SE2101()
+    this.SE2201()
+    this.SE2301()
+    this.SE2401()
+    this.SE2501()
+    this.SE2601()
+    this.SE2701()
+    this.SE2801()
+    this.SE2901()
   }
 
   recalculate() {
