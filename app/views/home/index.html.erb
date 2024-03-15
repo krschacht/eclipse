@@ -7,10 +7,11 @@
   <p class="text-lg mb-3">Your city, state</p>
   <input id="searchTextField" type="text" size="50" placeholder="Enter a location" autocomplete="on" runat="server" class="w-50">
   <input
+    id="go-button"
     type="button"
     value="Go"
     class="border border-black h-10 w-16 bg-gray-200 hover:cursor-pointer"
-    data-action="click->main#settimeperiod"
+    data-action="click->main#calculate"
     data-time-period-value="SE2001"
   >
   <p class="text-xs mt-2 text-gray-400">

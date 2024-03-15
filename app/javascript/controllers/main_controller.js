@@ -4,6 +4,7 @@ export default class extends Controller {
 
   connect() {
     console.log('connect()')
+    this.niceResults = []
 
     var input = document.getElementById('searchTextField')
     var autocomplete = new google.maps.places.Autocomplete(input, { types: ["geocode"] })
@@ -12,6 +13,7 @@ export default class extends Controller {
     var elevationService = new google.maps.ElevationService()
 
     google.maps.event.addListener(autocomplete, 'place_changed', async () => {
+      console.log('place_changed')
       this.clearoldresults()
 
       var lat, lon
@@ -24,17 +26,10 @@ export default class extends Controller {
       document.getElementById('lats').value = 0
       document.getElementById('latx').value = lat > 0 ? 1 : -1
 
-      if (document.getElementById('latd').value == 30 && document.getElementById('latm').value == 16) {
-        document.getElementById('lond').value = 97
-        document.getElementById('lonm').value = 44
-        document.getElementById('lons').value = 0
-        document.getElementById('lonx').value = 1
-      } else {
-        document.getElementById('lond').value = Math.abs(Math.floor(lon))
-        document.getElementById('lonm').value = Math.floor((lon - Math.floor(lon)) * 60)
-        document.getElementById('lons').value = 0
-        document.getElementById('lonx').value = lon > 0 ? -1 : 1
-      }
+      document.getElementById('lond').value = Math.abs(Math.floor(lon))
+      document.getElementById('lonm').value = Math.floor((lon - Math.floor(lon)) * 60)
+      document.getElementById('lons').value = 0
+      document.getElementById('lonx').value = lon > 0 ? -1 : 1
 
       // altitude
       var locations = [{lat: lat, lng: lon}];
@@ -1144,18 +1139,10 @@ export default class extends Controller {
     return document.createTextNode(a);
   }
 
-  clearoldresults() {
-    var results = document.getElementById("el_results");
-    if (results != null) results.innerHTML = '';
-    var newResults = document.getElementById("results");
-    if (newResults != null) newResults.innerHTML = '';
-  }
-
   // CALCULATE!
   calculatefor(el) {
     this.readform()
     //this.clearoldresults();
-    var list = document.getElementById("results");
     var results = document.getElementById("el_results");
     //console.log('first: ' + results.innerText == '')
 
@@ -1300,18 +1287,16 @@ export default class extends Controller {
       //if (this.mid[39] <= 2) continue // filters out everything except "T" type, TODO: what's "A"?
 
       if (this.mid[39] > 2) {
-        var div = document.createElement("div")
-        var h2 = document.createElement("h2")
-        var p = document.createElement("p")
-        div.appendChild(h2)
-        div.appendChild(p)
-
-        h2.setAttribute("class", "title")
-        h2.appendChild(document.createTextNode(`In ${this.getPrettyDistance(el,this.mid)}, on ${this.getPrettyDate(el,this.mid)}`))
-
-        p.appendChild(document.createTextNode(`The eclipse will begin at ${this.gettime(el,this.c1)} It will be totality at ${this.gettime(el,this.mid)} for a total of ${this.getPrettyDuration()}.`))
-
-        list.appendChild(div)
+        if (! this.niceResults.some(r => r.prettyDate == this.getPrettyDate(el,this.mid)) ) {
+          console.log('pushing')
+          this.niceResults.push({
+            prettyDate: this.getPrettyDate(el,this.mid),
+            prettyDistance: this.getPrettyDistance(el,this.mid),
+            startTime: this.gettime(el,this.c1),
+            totalityTime: this.gettime(el,this.mid),
+            duration: this.getPrettyDuration(),
+          })
+        }
       }
 
       if (document.getElementById('singlecolumn').classList.contains('hidden')) continue
@@ -1321,7 +1306,7 @@ export default class extends Controller {
       td = document.createElement("td");
       td.setAttribute("nowrap","")
       var val = document.createTextNode(this.getdate(el,this.mid));
-      console.log(`date: `, this.getdate(el,this.mid));
+      //console.log(`date: `, this.getdate(el,this.mid));
       td.appendChild(val);
       row.appendChild(td);
       td = document.createElement("td");
@@ -1349,7 +1334,7 @@ export default class extends Controller {
         td = document.createElement("td");
         td.setAttribute("nowrap","")
         td.appendChild(document.createTextNode(this.gettime(el,this.c1)));
-        console.log(`start: `, this.gettime(el,this.c1));
+        //console.log(`start: `, this.gettime(el,this.c1));
         row.appendChild(td);
         // Partial eclipse alt
         td = document.createElement("td");
@@ -1371,7 +1356,7 @@ export default class extends Controller {
       td = document.createElement("td");
           td.setAttribute("nowrap","")
       td.appendChild(document.createTextNode(this.gettime(el,this.mid)));
-      console.log(`totality: `, this.gettime(el,this.mid))
+      //console.log(`totality: `, this.gettime(el,this.mid))
       row.appendChild(td);
       // Maximum eclipse alt
       td = document.createElement("td");
@@ -1428,7 +1413,7 @@ export default class extends Controller {
         td.setAttribute("align","right");
             td.setAttribute("nowrap","")
         val = document.createTextNode(this.getduration());
-        console.log(`duration: `, this.getduration());
+        //console.log(`duration: `, this.getduration());
       } else {
         td.setAttribute("align","center");
         val = document.createTextNode("-");
@@ -1504,9 +1489,19 @@ export default class extends Controller {
     this.clearoldresults();
   }
 
-  settimeperiod(event) {
-    this.clearoldresults()
-    var timeperiod = event.currentTarget.getAttribute('data-time-period-value')
+  clearoldresults() {
+    this.currenttimeperiod = ""
+    this.loadedtimeperiods = new Array()
+    var results = document.getElementById("el_results");
+    if (results != null) results.innerHTML = '';
+    var newResults = document.getElementById("results");
+    if (newResults != null) newResults.innerHTML = '';
+  }
+
+  calculate(event) {
+    var origLat, origLon, lat, lon
+
+    var timeperiod = document.getElementById('go-button').getAttribute('data-time-period-value')
     console.log(`value = ${timeperiod}`)
 
     for (var i = 0 ; i < this.loadedtimeperiods.length ; i++) {
@@ -1530,6 +1525,61 @@ export default class extends Controller {
     // head.appendChild(script);
 
     //this.recalculate()
+
+//   console.log(`${lat}, ${lon}`)
+
+    origLat = parseInt(document.getElementById('latd').value) * (document.getElementById('latx').value == '-1' ? -1 : 1)
+    origLon = parseInt(document.getElementById('lond').value) * (document.getElementById('lonx').value == '1' ? -1 : 1)
+
+    this.clearoldresults()
+    this.niceResults = new Array()
+
+    for (let i = 0; i < 4; i++) {
+      if (i == 0) {
+        lat = -1 + origLat
+        lon = -1 + origLon
+      }
+      if (i == 1) {
+        lat = -1 + origLat
+        lon = 1 + origLon
+      }
+      if (i == 2) {
+        lat = 1 + origLat
+        lon = 1 + origLon
+      }
+      if (i == 3) {
+        lat = 1 + origLat
+        lon = -1 + origLon
+      }
+
+      console.log(`checking ${lat}, ${lon}`)
+      document.getElementById('latd').value = Math.abs(lat)
+      document.getElementById('latx').value = lat > 0 ? 1 : -1
+
+      document.getElementById('lond').value = Math.abs(lon)
+      document.getElementById('lonx').value = lon > 0 ? -1 : 1
+
+      this.SE2001()
+      this.SE2101()
+      this.SE2201()
+      this.SE2301()
+      this.SE2401()
+      this.SE2501()
+      this.SE2601()
+      this.SE2701()
+      this.SE2801()
+      this.SE2901()
+    }
+
+    this.clearoldresults()
+
+    console.log(`checking ${origLat}, ${origLon}`)
+    document.getElementById('latd').value = Math.abs(origLat)
+    document.getElementById('latx').value = origLat > 0 ? 1 : -1
+
+    document.getElementById('lond').value = Math.abs(origLon)
+    document.getElementById('lonx').value = origLon > 0 ? -1 : 1
+
     this.SE2001()
     this.SE2101()
     this.SE2201()
@@ -1540,6 +1590,28 @@ export default class extends Controller {
     this.SE2701()
     this.SE2801()
     this.SE2901()
+
+    console.log(this.niceResults)
+    this.displayNiceResults()
+  }
+
+  displayNiceResults() {
+    var list = document.getElementById("results");
+
+    for(let i = 0; i < this.niceResults.length; i ++) {
+      var div = document.createElement("div")
+      var h2 = document.createElement("h2")
+      var p = document.createElement("p")
+      div.appendChild(h2)
+      div.appendChild(p)
+
+      h2.setAttribute("class", "title")
+      h2.appendChild(document.createTextNode(`In ${this.niceResults[i].prettyDistance}, on ${this.niceResults[i].prettyDate}`))
+
+      p.appendChild(document.createTextNode(`The eclipse will begin at ${this.niceResults[i].startTime} It will be totality at ${this.niceResults[i].totalityTime} for a total of ${this.niceResults[i].duration}.`))
+
+      list.appendChild(div)
+    }
   }
 
   recalculate() {
