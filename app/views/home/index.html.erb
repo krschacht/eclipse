@@ -1,7 +1,11 @@
+
+<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCvAe-Q_gFiX6G5HcVOAwVHiAK4M0C6Pjs&callback=console.debug&libraries=places"></script>
+
+
 <header class="mt-28 text-center">
   <h1 class="text-3xl font-bold mb-10">When is my next total solar eclipse?</h1>
   <p class="text-lg mb-3">Your city, state</p>
-  <input type="text" class="w-50">
+  <input id="searchTextField" type="text" size="50" placeholder="Enter a location" autocomplete="on" runat="server" class="w-50">
   <input
     type="button"
     value="Go"
@@ -75,10 +79,10 @@
         <tr>
           <td> Latitude: </td>
           <td>
-              <input type="text" name="latd" size="3" value="30" onchange="newloc()"> deg
-          <input type="text" name="latm" size="3" value="16" onchange="newloc()"> min
-              <input type="text" name="lats" size="3" value="0" onchange="newloc()"> sec
-                <select name="latx" size="1" onchange="newloc()">
+              <input type="text" id="latd" name="latd" size="3" value="30" onchange="newloc()"> deg
+              <input type="text" id="latm" name="latm" size="3" value="16" onchange="newloc()"> min
+              <input type="text" id="lats" name="lats" size="3" value="0" onchange="newloc()"> sec
+                <select id="latx" name="latx" size="1" onchange="newloc()">
                   <option value="1" selected>N</option>
                   <option value="-1">S</option>
                 </select>
@@ -87,10 +91,10 @@
         <tr>
         <td>Longitude: </td>
         <td>
-              <input type="text" size="3" name="lond" value="97" onchange="newloc()"> deg
-              <input type="text" size="3" name="lonm" value="44" onchange="newloc()"> min
-              <input type="text" size="3" name="lons" value="0" onchange="newloc()"> sec
-                <select name="lonx" size="1" onchange="newloc()">
+              <input type="text" size="3" id="lond" name="lond" value="97" onchange="newloc()"> deg
+              <input type="text" size="3" id="lonm" name="lonm" value="44" onchange="newloc()"> min
+              <input type="text" size="3" id="lons" name="lons" value="0" onchange="newloc()"> sec
+                <select id="lonx" name="lonx" size="1" onchange="newloc()">
                   <option value="1" selected>W</option>
                   <option value="-1">E</option>
                 </select>
@@ -98,12 +102,12 @@
         </tr>
         <tr>
           <td>Altitude: </td>
-              <td><input type="text" size="5" name="alt" value="182" onchange="newloc()"> meters</td>
+              <td><input type="text" size="5" id="alt" name="alt" value="182" onchange="newloc()"> meters</td>
         </tr>
         <tr>
               <td>Time Zone: </td>
               <td>
-              <select name="tzh" size="1" onchange="newloc()">
+              <select id="tzh" name="tzh" size="1" onchange="newloc()">
                   <option value="0">00</option>
                   <option value="1">01</option>
                   <option value="2">02</option>
@@ -121,13 +125,13 @@
                   <option value="14">14</option>
                 </select>
 
-                <select name="tzm" size="1" onchange="newloc()">
+                <select id="tzm" name="tzm" size="1" onchange="newloc()">
                   <option value="0" selected>00</option>
                   <option value="15">15</option>
                   <option value="30">30</option>
                   <option value="45">45</option>
                 </select>
-                <select name="tzx" size="1" onchange="newloc()">
+                <select id="tzx" name="tzx" size="1" onchange="newloc()">
                   <option value="-1">E</option>
                   <option value="1" selected>W</option>
                 </select>

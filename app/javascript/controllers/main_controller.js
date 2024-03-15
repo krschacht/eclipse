@@ -1,8 +1,53 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
+
   connect() {
     console.log('connect()')
+
+    var input = document.getElementById('searchTextField');
+    var autocomplete = new google.maps.places.Autocomplete(input, { types: ["geocode"] });
+    autocomplete.setFields(['address_component', 'geometry']);
+
+    var elevationService = new google.maps.ElevationService();
+
+    google.maps.event.addListener(autocomplete, 'place_changed', async () => {
+      var lat, lon
+      var place = autocomplete.getPlace()
+      lat = place.geometry.location.lat()
+      lon = place.geometry.location.lng()
+
+      document.getElementById('latd').value = Math.abs(Math.floor(lat))
+      document.getElementById('latm').value = Math.floor((lat - Math.floor(lat)) * 60)
+      document.getElementById('lats').value = 0
+      document.getElementById('latx').value = lat > 0 ? 1 : -1
+
+      document.getElementById('lond').value = Math.abs(Math.floor(lon))
+      document.getElementById('lonm').value = Math.floor((lon - Math.floor(lon)) * 60)
+      document.getElementById('lons').value = 0
+      document.getElementById('lonx').value = lon > 0 ? -1 : 1
+
+      // altitude
+      var locations = [{lat: lat, lng: lon}];
+
+      elevationService.getElevationForLocations({
+          'locations': locations
+      }, function(results, status) {
+          if (status === 'OK') {
+              document.getElementById('alt').value = Math.round(results[0].elevation)
+          }
+      });
+
+      const r = await fetch(`/timezone?lat=${lat}&lon=${lon}`, { method: 'GET' })
+      const tz = (await r.json()).offset
+      console.log(tz)
+      console.log(tz / 3600)
+
+      const hrs = (tz / 3600)
+      document.getElementById('tzh').value = Math.abs(Math.floor(hrs))
+      document.getElementById('tzm').value = (hrs - Math.floor(hrs))
+      document.getElementById('tzx').value = hrs > 0 ? -1 : 1
+    });
 
     this.cities = new Array(
       "- - - CANADA - - -",  0,  0,  0,  0,  0,  0,  0,  0,
