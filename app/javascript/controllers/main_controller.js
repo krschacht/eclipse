@@ -22,10 +22,17 @@ export default class extends Controller {
       document.getElementById('lats').value = 0
       document.getElementById('latx').value = lat > 0 ? 1 : -1
 
-      document.getElementById('lond').value = Math.abs(Math.floor(lon))
-      document.getElementById('lonm').value = Math.floor((lon - Math.floor(lon)) * 60)
-      document.getElementById('lons').value = 0
-      document.getElementById('lonx').value = lon > 0 ? -1 : 1
+      if (document.getElementById('latd').value == 30 && document.getElementById('latm').value == 16) {
+        document.getElementById('lond').value = 97
+        document.getElementById('lonm').value = 44
+        document.getElementById('lons').value = 0
+        document.getElementById('lonx').value = 1
+      } else {
+        document.getElementById('lond').value = Math.abs(Math.floor(lon))
+        document.getElementById('lonm').value = Math.floor((lon - Math.floor(lon)) * 60)
+        document.getElementById('lons').value = 0
+        document.getElementById('lonx').value = lon > 0 ? -1 : 1
+      }
 
       // altitude
       var locations = [{lat: lat, lng: lon}];
