@@ -5,3 +5,13 @@
 .title {
   @apply text-xl font-bold mb-3;
 }
+
+table, th, td {
+  border: 1px solid black;
+  background-color: #cccccc;
+}
+
+table {
+  width: 100%;
+}
+

@@ -22,10 +22,9 @@
   <div id="qualifications" class="hidden"></div>
   <div id="results" class="w-96 h-full space-y-14">
   </div>
-  <div id="old-results" class="hidden"></div>
 </article>
 
-<div id="singlecolumn">
+<div id="singlecolumn" class="<%= params[:debug].blank? && 'hidden' %>">
   <div class="hidden">
     <h2><strong>
       NORTH AMERICA, CENTRAL AMERICA & CARIBBEAN
@@ -54,7 +53,7 @@
     </pre>
   </div>
 
-  <form name="eclipseform" class="hidden">
+  <form name="eclipseform">
     <div>
       <table border="0" cellspacing="14">
         <h2>Section 1: City Coordinates</h2>
@@ -139,180 +138,6 @@
             </tr>
       </table>
 
-
-      <h2>Section 2: Century Selection</h2>
-
-      <table border="0">
-        <tr>
-            <td>Choose century: </td>
-        </tr>
-
-        <tr>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SEm1499" value= "-1499 to -1400">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SEm1399" value= "-1399 to -1300">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SEm1299" value= "-1299 to -1200">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SEm1199" value= "-1199 to -1100">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SEm1099" value= "-1099 to -1000">
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SEm0999" value="-0999 to -0900">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SEm0899" value="-0899 to -0800">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SEm0799" value= "-0799 to -0700">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SEm0699" value= "-0699 to -0600">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SEm0599" value= "-0599 to -0500">
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SEm0499" value= "-0499 to -0400">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SEm0399" value= "-0399 to -0300">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SEm0299" value= "-0299 to -0200">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SEm0199" value= "-0199 to -0100">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SEm0099" value= "-0099 to -0000">
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE0001" value="0001 - 0100">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE0101" value="0101 - 0200">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE0201" value="0201 - 0300">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE0301" value="0301 - 0400">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE0401" value="0401 - 0500">
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE0501" value="0501 - 0600">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE0601" value="0601 - 0700">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE0701" value="0701 - 0800">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE0801" value="0801 - 0900">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE0901" value="0901 - 1000">
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE1001" value="1001 - 1100">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE1101" value="1101 - 1200">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE1201" value="1201 - 1300">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE1301" value="1301 - 1400">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE1401" value="1401 - 1500">
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE1501" value="1501 - 1600">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE1601" value="1601 - 1700">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE1701" value="1701 - 1800">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE1801" value="1801 - 1900">
-            </td>
-            <td>
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE1901" value="1901 - 2000">
-            </td>
-        </tr>
-
-        <tr>
-              <td colspan="1">
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE2001" value="2001 - 2100">
-              </td>
-              <td colspan="1">
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE2101" value="2101 - 2200">
-              </td>
-              <td colspan="1">
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE2201" value="2201 - 2300">
-              </td>
-              <td colspan="1">
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE2301" value="2301 - 2400">
-              </td>
-              <td colspan="1">
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE2401" value="2401 - 2500">
-              </td>
-        </tr>
-
-        <tr>
-              <td colspan="1">
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE2501" value="2501 - 2600">
-              </td>
-              <td colspan="1">
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE2601" value="2601 - 2700">
-              </td>
-              <td colspan="1">
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE2701" value="2701 - 2800">
-              </td>
-              <td colspan="1">
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE2801" value="2801 - 2900">
-              </td>
-              <td colspan="1">
-                <input type="button" data-action="click->main#settimeperiod" data-time-period-value="SE2901" value="2901 - 3000">
-              </td>
-        </tr>
-
-      </table>
-
-      <hr />
-
       <pre>
       </pre>
     </div>
@@ -320,8 +145,7 @@
 
   <h2 class="hidden">Section 3: Eclipse Predictions</h2>
 
-  <div id="el_results">
-
+  <div id="el_results" class="mt-10">
   </div>
 
   <div class="hidden">

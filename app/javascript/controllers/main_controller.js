@@ -5,13 +5,15 @@ export default class extends Controller {
   connect() {
     console.log('connect()')
 
-    var input = document.getElementById('searchTextField');
-    var autocomplete = new google.maps.places.Autocomplete(input, { types: ["geocode"] });
-    autocomplete.setFields(['address_component', 'geometry']);
+    var input = document.getElementById('searchTextField')
+    var autocomplete = new google.maps.places.Autocomplete(input, { types: ["geocode"] })
+    autocomplete.setFields(['address_component', 'geometry'])
 
-    var elevationService = new google.maps.ElevationService();
+    var elevationService = new google.maps.ElevationService()
 
     google.maps.event.addListener(autocomplete, 'place_changed', async () => {
+      this.clearoldresults()
+
       var lat, lon
       var place = autocomplete.getPlace()
       lat = place.geometry.location.lat()
@@ -900,7 +902,7 @@ export default class extends Controller {
   //
   // Get the local time of an event
   gettime(elements,circumstances) {
-    var t, ans, index, ampm
+    var t, ans, index, ampm, html, ital
 
     ans = ""
     index = this.obsvconst[6]
@@ -941,7 +943,7 @@ export default class extends Controller {
       ital = document.createElement("i");
       ital.appendChild(document.createTextNode(ans));
       html.appendChild(ital);
-      return html;
+      return ans;
     } else if (circumstances[40] == 2) {
       return ans+"(r) "+ampm;
     } else if (circumstances[40] == 3) {
@@ -954,7 +956,7 @@ export default class extends Controller {
   //
   // Get the altitude
   getalt(circumstances) {
-    var t, ans
+    var t, ans, html, ital
 
     if (circumstances[40] == 2) {
       return document.createTextNode("0(r)");
@@ -994,7 +996,7 @@ export default class extends Controller {
   //
   // Get the azimuth
   getazi(circumstances) {
-    var t, ans
+    var t, ans, html, ital
 
     ans = ""
     t = circumstances[35] * 180.0 / Math.PI
@@ -1054,7 +1056,7 @@ export default class extends Controller {
   }
 
   getPrettyDuration() {
-    var tmp;
+    var tmp, ans
 
     if (this.c3[40] == 4) {
       tmp = this.mid[1]-this.c2[1]
@@ -1079,13 +1081,13 @@ export default class extends Controller {
     if (min > 0)
       return `${min} minute${min > 1 ? 's' : ''} and ${sec} second${sec > 1 ? 's' : ''}`
     else
-      reutrn `${sec} second${sec > 1 ? 's' : ''}`
+      return `${sec} second${sec > 1 ? 's' : ''}`
   }
 
   //
   // Get the magnitude
   getmagnitude() {
-    var a
+    var a, html, ital
 
     a = Math.floor(1000.0*this.mid[37]+0.5)/1000.0
     if (this.mid[40] == 1) {
@@ -1108,7 +1110,7 @@ export default class extends Controller {
   //
   // Get the coverage
   getcoverage() {
-    var a, b, c
+    var a, b, c, html, ital
 
     if (this.mid[37] <= 0.0) {
       a = "0.0"
@@ -1144,10 +1146,9 @@ export default class extends Controller {
 
   clearoldresults() {
     var results = document.getElementById("el_results");
-    var resultsTable = document.getElementById("el_locationtable");
-    if (resultsTable != null) results.removeChild(resultsTable);
-    resultsTable = document.getElementById("el_resultstable");
-    if (resultsTable != null) results.removeChild(resultsTable);
+    if (results != null) results.innerHTML = '';
+    var newResults = document.getElementById("results");
+    if (newResults != null) newResults.innerHTML = '';
   }
 
   // CALCULATE!
@@ -1155,7 +1156,7 @@ export default class extends Controller {
     this.readform()
     //this.clearoldresults();
     var list = document.getElementById("results");
-    var results = document.getElementById("old-results");
+    var results = document.getElementById("el_results");
     //console.log('first: ' + results.innerText == '')
 
     var qualifications = document.getElementById("qualifications");
@@ -1294,20 +1295,27 @@ export default class extends Controller {
     for (var i = 0 ; i < el.length ; i+=28) {
       this.obsvconst[6]=i;
       this.getall(el)
-      if (this.mid[39] <= 2) continue // filters out everything except "T" type, TODO: what's "A"?
+      if (this.mid[39] <= 0) continue
 
-      var div = document.createElement("div")
-      var h2 = document.createElement("h2")
-      var p = document.createElement("p")
-      div.appendChild(h2)
-      div.appendChild(p)
+      //if (this.mid[39] <= 2) continue // filters out everything except "T" type, TODO: what's "A"?
 
-      h2.setAttribute("class", "title")
-      h2.appendChild(document.createTextNode(`In ${this.getPrettyDistance(el,this.mid)}, on ${this.getPrettyDate(el,this.mid)}`))
+      if (this.mid[39] > 2) {
+        var div = document.createElement("div")
+        var h2 = document.createElement("h2")
+        var p = document.createElement("p")
+        div.appendChild(h2)
+        div.appendChild(p)
 
-      p.appendChild(document.createTextNode(`The eclipse will begin at ${this.gettime(el,this.c1)} It will be totality at ${this.gettime(el,this.mid)} for a total of ${this.getPrettyDuration()}.`))
+        h2.setAttribute("class", "title")
+        h2.appendChild(document.createTextNode(`In ${this.getPrettyDistance(el,this.mid)}, on ${this.getPrettyDate(el,this.mid)}`))
 
-      list.appendChild(div)
+        p.appendChild(document.createTextNode(`The eclipse will begin at ${this.gettime(el,this.c1)} It will be totality at ${this.gettime(el,this.mid)} for a total of ${this.getPrettyDuration()}.`))
+
+        list.appendChild(div)
+      }
+
+      if (document.getElementById('singlecolumn').classList.contains('hidden')) continue
+
       // There an event...
       row = document.createElement("tr");
       td = document.createElement("td");
@@ -1323,7 +1331,7 @@ export default class extends Controller {
       } else if (this.mid[39] == 2) {
         val = document.createTextNode("A"); // TODO: What is an "A" eclipse?
       } else {
-        val = document.createTextNode("T");
+        val = document.createTextNode(`T ${this.mid[39]}`);
       }
       td.appendChild(val);
       row.appendChild(td);
@@ -1454,7 +1462,6 @@ export default class extends Controller {
 
   citychange() {
     console.log('this.citychange()')
-    this.clearoldresults();
     var index = Number(document.eclipseform.cityndx.value);
     if (index <= 0) return;
     var hemisphere=0;
@@ -1498,6 +1505,7 @@ export default class extends Controller {
   }
 
   settimeperiod(event) {
+    this.clearoldresults()
     var timeperiod = event.currentTarget.getAttribute('data-time-period-value')
     console.log(`value = ${timeperiod}`)
 
