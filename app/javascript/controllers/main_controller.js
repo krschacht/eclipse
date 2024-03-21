@@ -4,7 +4,8 @@ export default class extends Controller {
 
   connect() {
     console.log('connect()')
-    this.niceResults = []
+    this.nearbyResults = []
+    this.myResults = []
 
     var input = document.getElementById('searchTextField')
     var autocomplete = new google.maps.places.Autocomplete(input, { types: ["geocode"] })
@@ -1287,9 +1288,10 @@ export default class extends Controller {
       //if (this.mid[39] <= 2) continue // filters out everything except "T" type, TODO: what's "A"?
 
       if (this.mid[39] > 2) {
-        if (! this.niceResults.some(r => r.prettyDate == this.getPrettyDate(el,this.mid)) ) {
+        if (! this.myResults.some(r => r.prettyDate == this.getPrettyDate(el,this.mid)) &&
+            ! this.nearbyResults.some(r => r.prettyDate == this.getPrettyDate(el,this.mid)) ) {
           console.log('pushing')
-          this.niceResults.push({
+          this.nearbyResults.push({
             prettyDate: this.getPrettyDate(el,this.mid),
             prettyDistance: this.getPrettyDistance(el,this.mid),
             startTime: this.gettime(el,this.c1),
@@ -1502,7 +1504,10 @@ export default class extends Controller {
     var origLat, origLon, lat, lon
 
     var timeperiod = document.getElementById('go-button').getAttribute('data-time-period-value')
-    console.log(`value = ${timeperiod}`)
+
+    document.querySelectorAll('.my-location').forEach(function(el) {
+      el.innerText = `"${document.getElementById('searchTextField').value}"`
+    });
 
     for (var i = 0 ; i < this.loadedtimeperiods.length ; i++) {
       if (this.loadedtimeperiods[i] == timeperiod) {
@@ -1532,7 +1537,38 @@ export default class extends Controller {
     origLon = parseInt(document.getElementById('lond').value) * (document.getElementById('lonx').value == '1' ? -1 : 1)
 
     this.clearoldresults()
-    this.niceResults = new Array()
+    this.myResults = new Array()
+    this.nearbyResults = new Array()
+
+    console.log(`############`)
+    console.log(`orig ${document.getElementById('latd').value}.${document.getElementById('latm').value}, ${document.getElementById('lond').value}.${document.getElementById('lonm').value}`)
+
+
+    console.log(`checking ${origLat}, ${origLon}`)
+    document.getElementById('latd').value = Math.abs(origLat)
+    document.getElementById('latx').value = origLat > 0 ? 1 : -1
+
+    document.getElementById('lond').value = Math.abs(origLon)
+    document.getElementById('lonx').value = origLon > 0 ? -1 : 1
+
+    console.log(`orig ${document.getElementById('latd').value}.${document.getElementById('latm').value}, ${document.getElementById('lond').value}.${document.getElementById('lonm').value}`)
+
+    this.SE2001()
+    this.SE2101()
+    this.SE2201()
+    this.SE2301()
+    this.SE2401()
+    this.SE2501()
+    this.SE2601()
+    this.SE2701()
+    this.SE2801()
+    this.SE2901()
+
+
+    this.myResults = this.nearbyResults
+    console.log(`myResults`, this.myResults)
+    this.clearoldresults()
+    this.nearbyResults = new Array()
 
     for (let i = 0; i < 4; i++) {
       if (i == 0) {
@@ -1571,34 +1607,17 @@ export default class extends Controller {
       this.SE2901()
     }
 
-    this.clearoldresults()
 
-    console.log(`checking ${origLat}, ${origLon}`)
-    document.getElementById('latd').value = Math.abs(origLat)
-    document.getElementById('latx').value = origLat > 0 ? 1 : -1
-
-    document.getElementById('lond').value = Math.abs(origLon)
-    document.getElementById('lonx').value = origLon > 0 ? -1 : 1
-
-    this.SE2001()
-    this.SE2101()
-    this.SE2201()
-    this.SE2301()
-    this.SE2401()
-    this.SE2501()
-    this.SE2601()
-    this.SE2701()
-    this.SE2801()
-    this.SE2901()
-
-    console.log(this.niceResults)
-    this.displayNiceResults()
+    document.querySelector('article').classList.remove('hidden')
+    this.displayMyResults()
+    this.displayNearbyResults()
   }
 
-  displayNiceResults() {
-    var list = document.getElementById("results");
+  displayMyResults() {
+    var list = document.getElementById("my-results");
 
-    for(let i = 0; i < this.niceResults.length; i ++) {
+    if (false && this.myResults.length >= 1) {
+      var i = 0
       var div = document.createElement("div")
       var h2 = document.createElement("h2")
       var p = document.createElement("p")
@@ -1606,9 +1625,37 @@ export default class extends Controller {
       div.appendChild(p)
 
       h2.setAttribute("class", "title")
-      h2.appendChild(document.createTextNode(`In ${this.niceResults[i].prettyDistance}, on ${this.niceResults[i].prettyDate}`))
+      h2.appendChild(document.createTextNode(`In ${this.myResults[i].prettyDistance}, on ${this.myResults[i].prettyDate}`))
 
-      p.appendChild(document.createTextNode(`The eclipse will begin at ${this.niceResults[i].startTime} It will be totality at ${this.niceResults[i].totalityTime} for a total of ${this.niceResults[i].duration}.`))
+      p.appendChild(document.createTextNode(`The eclipse will begin at ${this.myResults[i].startTime} It will be totality at ${this.myResults[i].totalityTime} for a total of ${this.myResults[i].duration}.`))
+
+      list.appendChild(div)
+    } else {
+      var div = document.createElement("div")
+      var p = document.createElement("p")
+      div.appendChild(p)
+
+      p.appendChild(document.createTextNode(`Sorry, but there will be none visible from here within the next 1,000 years.`))
+
+      list.appendChild(div)
+
+    }
+  }
+
+  displayNearbyResults() {
+    var list = document.getElementById("nearby-results");
+
+    for(let i = 0; i < this.nearbyResults.length; i ++) {
+      var div = document.createElement("div")
+      var h2 = document.createElement("h2")
+      var p = document.createElement("p")
+      div.appendChild(h2)
+      div.appendChild(p)
+
+      h2.setAttribute("class", "title")
+      h2.appendChild(document.createTextNode(`In ${this.nearbyResults[i].prettyDistance}, on ${this.nearbyResults[i].prettyDate}`))
+
+      p.appendChild(document.createTextNode(`The eclipse will begin at ${this.nearbyResults[i].startTime} It will be totality at ${this.nearbyResults[i].totalityTime} for a total of ${this.nearbyResults[i].duration}.`))
 
       list.appendChild(div)
     }

@@ -3,9 +3,9 @@
 
 
 <header class="mt-28 text-center">
-  <h1 class="text-3xl font-bold mb-10">When is my next total solar eclipse?</h1>
-  <p class="text-lg mb-3">Your city, state</p>
-  <input id="searchTextField" type="text" size="50" placeholder="Enter a location" autocomplete="on" runat="server" class="w-50">
+  <h1 class="text-3xl font-bold mb-10">When's the next <i>total</i> solar eclipse for me?</h1>
+  <p class="text-lg mb-3">Your city, state (or address)</p>
+  <input id="searchTextField" type="text" size="50" placeholder="Enter a location" autocomplete="on" runat="server" class="w-50" autofocus=true>
   <input
     id="go-button"
     type="button"
@@ -19,10 +19,16 @@
   </p>
 </header>
 
-<article class="w-full flex justify-center items-center flex-col mt-14">
+<article class="w-full flex justify-center items-center flex-col mt-14 hidden">
   <div id="qualifications" class="hidden"></div>
-  <div id="results" class="w-96 h-full space-y-14">
-  </div>
+  <header class="text-2xl font-medium mb-6 underline underline-offset-4">The <i class="font-bold">next time</i> one can be seen from <span class="my-location"></span> will be:</header>
+  <div id="my-results" class="w-96 h-full space-y-14"></div>
+
+  <header class="text-2xl font-medium mb-6 underline underline-offset-4 mt-10">The <i class="font-bold">last time</i> one could be seen from <span class="my-location"></span> was:</header>
+  <div id="previous-results" class="w-96 h-full space-y-14"></div>
+
+  <header class="text-2xl font-medium mb-6 underline underline-offset-4 mt-10">Total solar eclipses that will occur <i class="font-bold">within an hour drive</i> of <span class="my-location"></span> will be:</header>
+  <div id="nearby-results" class="w-96 h-full space-y-14"></div>
 </article>
 
 <div id="singlecolumn" class="<%= params[:debug].blank? && 'hidden' %>">
