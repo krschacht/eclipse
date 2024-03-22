@@ -1,35 +1,49 @@
 
 <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCvAe-Q_gFiX6G5HcVOAwVHiAK4M0C6Pjs&callback=console.debug&libraries=places"></script>
 
+<header class="text-center" data-controller="transition" data-transition-toggle-class="opacity-0 opacity-90" data-action="click->transition#toggleClassOn">
+  <h1 class="mt-20 md:mt-36 text-4xl font-bold text-white mb-10" style="text-shadow: 0px 0px 10px black, 1px 1px 4px black; font-family: 'Exo 2', sans-serif;">
+    A total solar eclipse, as seen from space.
+  </h1>
+  <button
+    data-controller="transition"
+    data-transition-toggle-class="hidden"
+    data-transition-target="transitionable"
+    class="underline text-white cursor-pointer text-lg md:text-2xl"
+    style="text-shadow: 0px 0px 10px black, 0px 0px 2px black;"
+    data-action="transition#toggleClassOn"
+  >When will it pass over me?</button>
 
-<header class="mt-28 text-center">
-  <h1 class="text-3xl font-bold mb-10">When's the next <i>total</i> solar eclipse for me?</h1>
-  <p class="text-lg mb-3">Your city, state (or address)</p>
-  <input id="searchTextField" type="text" size="50" placeholder="Enter a location" autocomplete="on" runat="server" class="w-50" autofocus=true>
-  <input
-    id="go-button"
-    type="button"
-    value="Go"
-    class="border border-black h-10 w-16 bg-gray-200 hover:cursor-pointer"
-    data-action="click->main#calculate"
-    data-time-period-value="SE2001"
-  >
-  <p class="text-xs mt-2 text-gray-400">
-    Predictions by Fred Espenak & Chris O'Byrne (NASA's GSFC)
-  </p>
+  <div class="max-w-xl mx-auto transition-all duration-2000 ease-in opacity-0 text-gray-700" data-transition-target="transitionable">
+    <div class="bg-white p-3 mx-2 pb-10 mb-2 rounded-md">
+      <p class="text-lg mb-3">Your city, state (or address)</p>
+      <input id="searchTextField" type="text" size="20" placeholder="Enter a location" autocomplete="on" runat="server" class="w-50 !rounded-md" autofocus="true" onClick="this.value = '';">
+      <input
+        id="go-button"
+        type="button"
+        value="Go"
+        class="border border-black h-10 w-16 bg-gray-200 hover:cursor-pointer hidden rounded-md"
+        data-action="click->main#calculate"
+        data-time-period-value="SE2001"
+      >
+      <p class="text-xs mt-2 text-gray-400">
+        Predictions by Fred Espenak & Chris O'Byrne (NASA)
+      </p>
+
+      <article class="w-full flex justify-center flex-col mt-10 text-left hidden">
+        <div id="qualifications" class="hidden"></div>
+
+        <header class="text-2xl font-medium mb-6 underline-offset-4" style="font-family: 'Exo 2', sans-serif;">The <i class="font-bold">previous</i> total solar eclipse was:</header>
+        <div id="last-results" class="h-full space-y-14 w-full px-6"></div>
+
+        <div id="my-results" class="h-full space-y-14 w-full mt-10"></div>
+
+        <header id="nearby-header" class="text-xl font-medium mb-6 mt-10 hidden" style="font-family: 'Exo 2', sans-serif;">However, the next total solar eclipse an hour away will be:</header>
+        <div id="nearby-results" class="h-full space-y-14 px-6"></div>
+      </article>
+    </div>
+  </div>
 </header>
-
-<article class="w-full flex justify-center items-center flex-col mt-14 hidden">
-  <div id="qualifications" class="hidden"></div>
-  <header class="text-2xl font-medium mb-6 underline underline-offset-4">The <i class="font-bold">next time</i> one can be seen from <span class="my-location"></span> will be:</header>
-  <div id="my-results" class="w-96 h-full space-y-14"></div>
-
-  <header class="text-2xl font-medium mb-6 underline underline-offset-4 mt-10">The <i class="font-bold">last time</i> one could be seen from <span class="my-location"></span> was:</header>
-  <div id="last-results" class="w-96 h-full space-y-14"></div>
-
-  <header class="text-2xl font-medium mb-6 underline underline-offset-4 mt-10">Total solar eclipses that will occur <i class="font-bold">within an hour drive</i> of <span class="my-location"></span> will be:</header>
-  <div id="nearby-results" class="w-96 h-full space-y-14"></div>
-</article>
 
 <div id="singlecolumn" class="<%= params[:debug].blank? && 'hidden' %>">
   <div class="hidden">
