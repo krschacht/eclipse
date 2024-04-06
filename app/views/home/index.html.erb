@@ -1,22 +1,18 @@
 
 <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCvAe-Q_gFiX6G5HcVOAwVHiAK4M0C6Pjs&callback=console.debug&libraries=places"></script>
 
-<header class="text-center" data-controller="transition" data-transition-toggle-class="opacity-0 opacity-90" data-action="click->transition#toggleClassOn">
-  <h1 class="mt-20 md:mt-36 text-4xl font-bold text-white mb-10" style="text-shadow: 0px 0px 10px black, 1px 1px 4px black; font-family: 'Exo 2', sans-serif;">
+<header class="text-center">
+  <h1 class="mt-20 md:mt-34 text-4xl font-bold text-white mb-10" style="text-shadow: 0px 0px 10px black, 1px 1px 4px black; font-family: 'Exo 2', sans-serif;">
     A total solar eclipse, as seen from space.
   </h1>
-  <button
-    data-controller="transition"
-    data-transition-toggle-class="hidden"
-    data-transition-target="transitionable"
-    class="underline text-white cursor-pointer text-lg md:text-2xl"
-    style="text-shadow: 0px 0px 10px black, 0px 0px 2px black;"
-    data-action="transition#toggleClassOn"
-  >When will it pass over me?</button>
 
-  <div class="max-w-xl mx-auto transition-all duration-2000 ease-in opacity-0 text-gray-700" data-transition-target="transitionable">
+  <div class="max-w-xl mx-auto transition-all duration-2000 ease-in opacity-90 text-gray-700">
     <div class="bg-white p-3 mx-2 pb-10 mb-2 rounded-md">
-      <p class="text-lg mb-3">Your city, state (or address)</p>
+      <p class="text-lg text-left">
+        To be in the direct path of a total solar eclipse is <i>INCREDIBLY</i> rare. How rare? Enter any location to find out the last time a total solar eclipse was visible from that location, as well as the next time.
+      </p>
+
+      <p class="text-lg mb-3 pr-1">City, state, country</p>
       <input id="searchTextField" type="text" size="20" placeholder="Enter a location" autocomplete="on" runat="server" class="w-50 !rounded-md" autofocus="true" onClick="this.value = '';">
       <input
         id="go-button"
@@ -33,12 +29,16 @@
       <article class="w-full flex justify-center flex-col mt-10 text-left hidden">
         <div id="qualifications" class="hidden"></div>
 
-        <header class="text-2xl font-medium mb-6 underline-offset-4" style="font-family: 'Exo 2', sans-serif;">The <i class="font-bold">previous</i> total solar eclipse was:</header>
+        <header class="text-2xl font-medium mb-6 underline-offset-4" style="font-family: 'Exo 2', sans-serif;">
+          The last time a total solar eclipse was visible from this location was:
+        </header>
         <div id="last-results" class="h-full space-y-14 w-full px-6"></div>
 
         <div id="my-results" class="h-full space-y-14 w-full mt-10"></div>
 
-        <header id="nearby-header" class="text-xl font-medium mb-6 mt-10 hidden" style="font-family: 'Exo 2', sans-serif;">However, the next total solar eclipse an hour away will be:</header>
+        <header id="nearby-header" class="text-xl font-medium mb-6 mt-2 hidden" style="font-family: 'Exo 2', sans-serif;">
+          However, the next total solar eclipse an hour away will be:
+        </header>
         <div id="nearby-results" class="h-full space-y-14 px-6"></div>
       </article>
     </div>
@@ -197,4 +197,3 @@
     <p>"Eclipse Predictions by Fred Espenak and Chris O'Byrne (NASA's GSFC)"</p>
   </div>
 </div> <!-- single column -->
-
